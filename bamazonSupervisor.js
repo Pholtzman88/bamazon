@@ -1,6 +1,12 @@
 //require dependencies
 var mysql = require("mysql");
-var inquirer = require("inquirer")
+var inquirer = require("inquirer");
+var Table = require('cli-table'); 
+// instantiate table
+var table = new Table({
+    head: ['ID', 'department_name',"over_head_costs","product_sales"]
+  , colWidths: [10, 20, 20, 20]
+});
 //set var connection to create connection to mysql database
 var connection = mysql.createConnection({
 	host	:"localhost",
@@ -10,6 +16,7 @@ var connection = mysql.createConnection({
 	database:"bamazon"
 });
 var data = [];
+var idArr = [];
 //run prompt when app opens
 inquirer.prompt(
 	{
@@ -49,10 +56,11 @@ function viewDepartmentSales(){
 		for (var i = 0; i < res.length; i++){
 			//push data for each iteration to data array
 			data.push([res[i].department_id,res[i].department_name,res[i].over_head_costs,res[i].product_sales]);
-			// console.log("ID)" + res[i].department_id + "  Dept)"+res[i].department_name + "  OHC)" + res[i].over_head_costs + "  Sales)" +res[i].product_sales);
+		};
+		for (var j = 0; j <data.length; j ++){
+			table.push(data[j]);
 		}
-		//log array after all data has been pushed
-		console.log(data);
+		console.log(table.toString());
 		//end connection
 		connection.end()
 	});

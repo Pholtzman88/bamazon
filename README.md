@@ -1,5 +1,11 @@
 # bamazon
 
+## setup
+
+In order to run this application properly you will need to install the following dependencies
+
+(/images/dependencies.PNG)
+
 ## bamazonCustomer.js
 
 Triggering this file in node will allow the user to purchase items from

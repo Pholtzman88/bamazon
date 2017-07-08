@@ -1,5 +1,11 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table'); 
+// instantiate table
+var table = new Table({
+    head: ['ID', 'product_name',"price","stock_quantity"]
+  , colWidths: [10, 20, 10, 20]
+});
 var connection = mysql.createConnection({
 	host	:"localhost",
 	port	:3306,
@@ -62,11 +68,9 @@ function viewProductsForSale(){
 
 		for(i=0;i<res.length;i++){
 			var p =res[i];
-			console.log("");			
-			console.log("ID - "+p.id+"\n" + "Product - " + p.product_name + "\n" +
-			 "Price - " + " $" + p.price + "\n" + "Quantity - " + p.stock_quantity);
-			console.log("----------------------------------------");
+			table.push([p.id,p.product_name,p.price,p.stock_quantity])
 		};	
+		console.log(table.toString());
 		connection.end();	
 	});
 };

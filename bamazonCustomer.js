@@ -1,5 +1,13 @@
+//require dependencies
 var mysql = require("mysql");
-var inquirer = require("inquirer")
+var inquirer = require("inquirer");
+var Table = require('cli-table'); 
+// instantiate table
+var table = new Table({
+    head: ['ID', 'product_name',"price"]
+  , colWidths: [10, 20, 10]
+});
+//set var connection to connect to mysql database
 var connection = mysql.createConnection({
 	host	:"localhost",
 	port	:3306,
@@ -15,8 +23,10 @@ connection.query("SELECT * FROM products", function(err,res){
 	for(i=0;i<res.length;i++){
 		//set var p as res for each iteration
 		var p =res[i];
-		console.log("["+p.id+"]" + " " + "-" + " " + p.product_name + " $" + p.price);
+		table.push([p.id,p.product_name,p.price]);
 	};
+	console.log(table.toString());
+	main();
 });
 
 function updateQuantity(quantity,key){
@@ -35,6 +45,7 @@ connection.query("UPDATE products SET ? WHERE ?",
 
 function calculateCost(quantity,price,log){
 	var totalCost = quantity * price;
+	//if log exist log total cost
 	if (log){
 	console.log("Your total cost for this transaction is "+totalCost+ " dollars");
 	}
@@ -56,41 +67,42 @@ function updateProductSales(currentRevenue,addedRevenue,key){
 			if (err) throw err;
 	});
 }
-
-inquirer.prompt([
-{
-	name: "product",
-	message: "please enter the ID of the product you wish to purchase.."
-},
-{
-	name: "quantity",
-	message: "please enter the quantity.."
-}
-]).then(function(a){
-	//connect to mysql and run query
-	connection.query("SELECT * FROM products WHERE id="+a.product,function(err,res){
-		//handle errors
-		if (err) throw err;
-		//defin check quantity function
-		function checkQuantity(request,availability){
-			//if the amount of products the customer requests exist in inventory
-			if (request <= availability){
-				//set var for remaining quantity
-				var remainingQuantity = availability - request;
-				//update quantity
-				updateQuantity(remainingQuantity,res[0].id);
-				//calculate cost and log
-				calculateCost(request,res[0].price,"log");
-				//update product sales
-				updateProductSales(res[0].product_sales,calculateCost(request,res[0].price),res[0].id);
-			}else{
-				console.log("sorry not enough inventory to fulfill your order..");
+//main 
+function main(){
+	inquirer.prompt([
+	{
+		name: "product",
+		message: "please enter the ID of the product you wish to purchase.."
+	},
+	{
+		name: "quantity",
+		message: "please enter the quantity.."
+	}
+	]).then(function(a){
+		//connect to mysql and run query
+		connection.query("SELECT * FROM products WHERE id="+a.product,function(err,res){
+			//handle errors
+			if (err) throw err;
+			//defin check quantity function
+			function checkQuantity(request,availability){
+				//if the amount of products the customer requests exist in inventory
+				if (request <= availability){
+					//set var for remaining quantity
+					var remainingQuantity = availability - request;
+					//update quantity
+					updateQuantity(remainingQuantity,res[0].id);
+					//calculate cost and log
+					calculateCost(request,res[0].price,"log");
+					//update product sales
+					updateProductSales(res[0].product_sales,calculateCost(request,res[0].price),res[0].id);
+				}else{
+					console.log("sorry not enough inventory to fulfill your order..");
+				};
 			};
-		};
-		//run check quantity function
-		checkQuantity(a.quantity,res[0].stock_quantity);
-		//end connection
-		connection.end();
+			//run check quantity function
+			checkQuantity(a.quantity,res[0].stock_quantity);
+			//end connection
+			connection.end();
+		});
 	});
-});
-
+}
