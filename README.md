@@ -17,7 +17,7 @@ to the mysql database.
 Triggering this file will allow the user to track departmental sales and
 profits as well as allow the user to add a new department.
  
-### demonstration
+
 click
 [here](https://youtu.be/7nOvEGPtCss)
 to access a demonstration of how users can interact with this application..
