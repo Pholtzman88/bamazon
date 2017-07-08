@@ -4,7 +4,7 @@
 
 In order to run this application properly you will need to install the following dependencies
 
-(/images/dependencies.PNG)
+![dependencies](/images/dependencies.PNG)
 
 ## bamazonCustomer.js
 
